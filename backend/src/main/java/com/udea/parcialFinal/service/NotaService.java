@@ -2,6 +2,7 @@ package com.udea.parcialFinal.service;
 
 import java.math.BigDecimal;
 
+import com.udea.parcialFinal.cache.ConsultaNotasCache;
 import com.udea.parcialFinal.dto.NotaRequest;
 import com.udea.parcialFinal.dto.NotaResponse;
 import com.udea.parcialFinal.dto.PageResponse;
@@ -10,7 +11,9 @@ import com.udea.parcialFinal.model.Materia;
 import com.udea.parcialFinal.model.Matricula;
 import com.udea.parcialFinal.repository.MateriaRepository;
 import com.udea.parcialFinal.repository.MatriculaRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,14 +26,18 @@ public class NotaService {
     private final EstudianteService estudiantes;
     private final MateriaRepository materias;
     private final MatriculaRepository matriculas;
+    private final ConsultaNotasCache cache;
 
-    public NotaService(EstudianteService estudiantes, MateriaRepository materias, MatriculaRepository matriculas) {
+    public NotaService(EstudianteService estudiantes, MateriaRepository materias, MatriculaRepository matriculas,
+            ConsultaNotasCache cache) {
         this.estudiantes = estudiantes;
         this.materias = materias;
         this.matriculas = matriculas;
+        this.cache = cache;
     }
 
     @Transactional
+    @CacheEvict(cacheNames = ConsultaNotasCache.CACHE, allEntries = true)
     public NotaResponse registrar(String cedula, NotaRequest solicitud) {
         String codigoMateria = Validacion.texto(solicitud.materiaCodigo(), "materiaCodigo", 20);
         BigDecimal nota = Validacion.nota(solicitud.nota());
@@ -44,10 +51,16 @@ public class NotaService {
 
     @Transactional(readOnly = true)
     public PageResponse<NotaResponse> consultar(String cedula, Pageable pagina) {
+        String cedulaValidada = Validacion.cedula(cedula);
+        var resultado = cache.consultar(cedulaValidada, pagina, () -> consultarEnBaseDeDatos(cedulaValidada, pagina));
+        return PageResponse.de(new PageImpl<>(resultado.notas(), pagina, resultado.total()));
+    }
+
+    private ConsultaNotasCache.Pagina consultarEnBaseDeDatos(String cedula, Pageable pagina) {
         Estudiante estudiante = estudiantes.buscarPorCedula(cedula);
-        Page<NotaResponse> resultado = matriculas.findByEstudiante_IdOrderByIdAsc(estudiante.getId(), pagina)
+        Page<NotaResponse> notas = matriculas.findByEstudiante_IdOrderByIdAsc(estudiante.getId(), pagina)
                 .map(matricula -> representarNota(matricula, estudiante.getCedula()));
-        return PageResponse.de(resultado);
+        return new ConsultaNotasCache.Pagina(notas.getContent(), notas.getTotalElements());
     }
 
     private NotaResponse representarNota(Matricula matricula, String cedula) {
