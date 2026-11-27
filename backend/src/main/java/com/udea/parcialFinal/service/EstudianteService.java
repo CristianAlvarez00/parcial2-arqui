@@ -28,6 +28,11 @@ public class EstudianteService {
         return PageResponse.de(resultado);
     }
 
+    @Transactional(readOnly = true)
+    public EstudianteResponse consultarPorCedula(String cedula) {
+        return representarEstudiante(buscarPorCedula(cedula));
+    }
+
     @Transactional
     public EstudianteResponse registrar(EstudianteRequest solicitud) {
         Estudiante estudiante = new Estudiante(
