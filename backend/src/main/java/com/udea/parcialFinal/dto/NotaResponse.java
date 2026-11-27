@@ -1,6 +1,9 @@
 package com.udea.parcialFinal.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public record NotaResponse(Long id, String cedula, String materiaCodigo, String materiaNombre, BigDecimal nota) {
+public record NotaResponse(
+        Long id, String cedula, String materiaCodigo, String materiaNombre, BigDecimal nota
+) implements Serializable {
 }

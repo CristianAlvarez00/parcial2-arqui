@@ -1,17 +1,18 @@
 package com.udea.parcialFinal.controller;
 
-import java.util.List;
-
 import com.udea.parcialFinal.dto.NotaRequest;
 import com.udea.parcialFinal.dto.NotaResponse;
+import com.udea.parcialFinal.dto.PageResponse;
 import com.udea.parcialFinal.service.NotaService;
-import org.springframework.data.domain.Pageable;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,8 +27,15 @@ public class NotaController {
     }
 
     @GetMapping
-    public List<NotaResponse> consultar(@PathVariable("cedula") String cedula) {
-        return notas.consultar(cedula, Pageable.unpaged()).getContent();
+    public PageResponse<NotaResponse> consultar(
+            @PathVariable("cedula") String cedula,
+            @RequestParam(name = "page", defaultValue = Paginacion.PAGINA_POR_DEFECTO) int page,
+            @Parameter(schema = @Schema(defaultValue = "10"))
+            @RequestParam(name = "size", required = false) Integer size,
+            @Parameter(hidden = true)
+            @RequestParam(name = "pageSize", required = false) Integer pageSize
+    ) {
+        return notas.consultar(cedula, Paginacion.crear(page, size, pageSize));
     }
 
     @PostMapping
