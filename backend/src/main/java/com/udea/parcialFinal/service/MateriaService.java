@@ -6,8 +6,10 @@ import com.udea.parcialFinal.model.Materia;
 import com.udea.parcialFinal.repository.MateriaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class MateriaService {
@@ -23,6 +25,14 @@ public class MateriaService {
         Page<MateriaResponse> resultado = materias.findAllByOrderByIdAsc(pagina)
                 .map(this::representarMateria);
         return PageResponse.de(resultado);
+    }
+
+    @Transactional(readOnly = true)
+    public MateriaResponse consultarPorCodigo(String codigo) {
+        String codigoValidado = Validacion.texto(codigo, "codigo", 20);
+        Materia materia = materias.findByCodigo(codigoValidado)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Materia no encontrada."));
+        return representarMateria(materia);
     }
 
     private MateriaResponse representarMateria(Materia materia) {
