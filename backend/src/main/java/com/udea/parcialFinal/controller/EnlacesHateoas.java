@@ -55,9 +55,10 @@ final class EnlacesHateoas {
         String cedula = nota.cedula();
         return EntityModel.of(
                 nota,
+                linkTo(NotaController.class, cedula).slash(nota.materiaCodigo()).withSelfRel(),
                 enlacePaginado(
                         linkTo(NotaController.class, cedula),
-                        0, Paginacion.TAMANO_POR_DEFECTO, IanaLinkRelations.SELF
+                        0, Paginacion.TAMANO_POR_DEFECTO, LinkRelation.of("notas")
                 ),
                 linkTo(EstudianteController.class).slash(cedula).withRel("estudiante"),
                 linkTo(MateriaController.class).slash(nota.materiaCodigo()).withRel("materia"),

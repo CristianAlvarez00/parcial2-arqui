@@ -139,6 +139,7 @@ class PaginacionControllerTest {
         NotaRequest reqNota = new NotaRequest("ARQ101", new BigDecimal("4.80"));
         NotaResponse respNota = new NotaResponse(10L, "1001", "ARQ101", "Arquitectura de Software", new BigDecimal("4.80"));
         when(notaService.registrar("1001", reqNota)).thenReturn(respNota);
+        when(notaService.consultarPorMateria("1001", "ARQ101")).thenReturn(respNota);
 
         MateriaResponse respMat = new MateriaResponse(2L, "ARQ101", "Arquitectura de Software");
         when(materiaService.consultarPorCodigo("ARQ101")).thenReturn(respMat);
@@ -162,9 +163,10 @@ class PaginacionControllerTest {
                                 {"materiaCodigo":"ARQ101","nota":4.80}
                                 """))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", endsWith("/api/v1/estudiantes/1001/notas?page=0&size=10")))
+                .andExpect(header().string("Location", endsWith("/api/v1/estudiantes/1001/notas/ARQ101")))
                 .andExpect(jsonPath("$.materiaCodigo").value("ARQ101"))
-                .andExpect(jsonPath("$._links.self.href", endsWith("/api/v1/estudiantes/1001/notas?page=0&size=10")))
+                .andExpect(jsonPath("$._links.self.href", endsWith("/api/v1/estudiantes/1001/notas/ARQ101")))
+                .andExpect(jsonPath("$._links.notas.href", endsWith("/api/v1/estudiantes/1001/notas?page=0&size=10")))
                 .andExpect(jsonPath("$._links.estudiante.href", endsWith("/api/v1/estudiantes/1001")))
                 .andExpect(jsonPath("$._links.materia.href", endsWith("/api/v1/materias/ARQ101")));
 
@@ -172,6 +174,11 @@ class PaginacionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.cedula").value("1001"))
                 .andExpect(jsonPath("$._links.self.href", endsWith("/api/v1/estudiantes/1001")));
+
+        mockMvc.perform(get("/api/v1/estudiantes/1001/notas/ARQ101").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nota").value(4.80))
+                .andExpect(jsonPath("$._links.self.href", endsWith("/api/v1/estudiantes/1001/notas/ARQ101")));
 
         mockMvc.perform(get("/api/v1/materias/ARQ101").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
