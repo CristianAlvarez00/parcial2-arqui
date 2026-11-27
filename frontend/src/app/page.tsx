@@ -21,13 +21,8 @@ const HERRAMIENTAS = [
 export default function Inicio() {
   return (
     <div className="py-4 sm:py-10">
-      <p className="text-sm font-medium tracking-wide text-[var(--mui-palette-primary-main)]">
-        Gestión académica
-      </p>
-      <h1 className="mt-2 max-w-2xl text-3xl font-semibold leading-tight sm:text-4xl">
-        Materias, estudiantes y notas en un solo lugar
-      </h1>
-      <p className="mt-3 max-w-xl text-[var(--mui-palette-text-secondary)]">
+      <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">Materias, estudiantes y notas</h1>
+      <p className="mt-3 text-[var(--mui-palette-text-secondary)]">
         Elige un listado para empezar. Desde cada uno puedes agregar notas de 0.00 a 5.00.
       </p>
 
