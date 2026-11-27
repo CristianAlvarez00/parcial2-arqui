@@ -1,0 +1,102 @@
+# Secretos y configuración local (nunca se suben al repositorio)
+# Los archivos *.example sí se versionan como plantilla
+.env
+.env.*
+!.env.example
+*.local
+*.pem
+*.key
+*.p12
+*.jks
+
+# Sistema operativo
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editores e IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+.settings/
+.project
+.classpath
+.factorypath
+.apt_generated
+.springBeans
+.sts4-cache
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/.nb-gradle/
+*.swp
+*.swo
+*~
+
+# Backend
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+HELP.md
+*.class
+*.log
+hs_err_pid*
+replay_pid*
+# Gradle (por si se usa en el futuro)
+.gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Frontend
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Build de Next.js y otros bundlers
+.next/
+next-env.d.ts
+dist/
+.vercel/
+.turbo/
+.vite/
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# TypeScript
+*.tsbuildinfo
+
+# Pruebas y cobertura
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+/blob-report/
+/playwright/.cache/
+
+# Logs de gestores de paquetes
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*

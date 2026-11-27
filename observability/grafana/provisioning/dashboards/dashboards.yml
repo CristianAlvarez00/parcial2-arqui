@@ -1,0 +1,11 @@
+apiVersion: 1
+
+# Carga los dashboards JSON de /var/lib/grafana/dashboards (montado desde observability/grafana/dashboards)
+providers:
+  - name: parcialFinal
+    folder: Backend
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    options:
+      path: /var/lib/grafana/dashboards

@@ -1,0 +1,16 @@
+# Configuración de Prometheus para el servicio prometheus de compose.yaml
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: spring-boot
+    metrics_path: /actuator/prometheus
+    # /actuator/prometheus está protegido con Basic auth (backend: config/MetricsSecurityConfig)
+    # compose.yaml escribe estos archivos al arrancar con METRICS_USER y METRICS_PASSWORD de backend/.env
+    # (este YAML no expande variables de entorno, por eso se leen de archivos)
+    basic_auth:
+      username_file: /tmp/metrics-user
+      password_file: /tmp/metrics-password
+    static_configs:
+      # Servicio api de compose.yaml
+      - targets: [api:8080]
