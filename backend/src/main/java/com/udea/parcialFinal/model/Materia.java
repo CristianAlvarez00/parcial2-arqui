@@ -26,6 +26,15 @@ public class Materia {
     protected Materia() {
     }
 
+    public Materia(String nombre, String codigo) {
+        this.nombre = nombre;
+        this.codigo = codigo;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
     public String getNombre() {
         return nombre;
     }
