@@ -1,6 +1,11 @@
 services:
   api:
     build: ./backend
+    # METRICS_USER y METRICS_PASSWORD: credenciales de /actuator/prometheus (copiar backend/.env.example a backend/.env)
+    # Las variables de environment tienen prioridad sobre las del archivo
+    env_file:
+      - path: ./backend/.env
+        required: true
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_DB: ${POSTGRES_DB:-parcial}
@@ -43,20 +48,45 @@ services:
       timeout: 3s
       retries: 12
 
+  # Observabilidad: Prometheus recoge /actuator/prometheus del AP y Grafana grafica las métricas
   prometheus:
-    image: prom/prometheus:v3.5.0
+    image: docker.io/prom/prometheus:v3.13.5
     ports:
       - "127.0.0.1:9090:9090"
+    # Mismas credenciales de lectura de métricas que el api (METRICS_USER y METRICS_PASSWORD)
+    env_file:
+      - path: ./backend/.env
+        required: true
+    # Al arrancar escribe las credenciales en archivos dentro del contenedor
+    # (prometheus.yml no expande variables de entorno) y luego inicia Prometheus
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        if [ -z "$$METRICS_PASSWORD" ]; then
+          echo "Falta METRICS_PASSWORD en backend/.env" >&2
+          exit 1
+        fi
+        umask 077
+        printf '%s' "$${METRICS_USER:-prometheus-local}" > /tmp/metrics-user
+        printf '%s' "$$METRICS_PASSWORD" > /tmp/metrics-password
+        exec /bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus
     volumes:
-      - ./observabilidad/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
 
   grafana:
-    image: grafana/grafana:12.1.1
+    image: docker.io/grafana/grafana:13.3.1
     ports:
       - "127.0.0.1:3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin # solo para uso local; en cualquier otro entorno se define como secreto
+      GF_USERS_ALLOW_SIGN_UP: "false"
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./observabilidad/grafana/provisioning/datasources/prometheus.yml:/etc/grafana/provisioning/datasources/prometheus.yml:ro
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      # Dashboards provisionados (4701 "JVM (Micrometer)")
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
     depends_on:
       - prometheus
 
