@@ -5,18 +5,33 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.RepresentationModel;
 
+@Schema(description = "Respuesta paginada con metadatos de navegación y enlaces HATEOAS")
 @JsonPropertyOrder({"content", "page", "size", "totalElements", "totalPages", "first", "last", "_links"})
 public class PageResponse<T> extends RepresentationModel<PageResponse<T>> implements Serializable {
 
+    @Schema(description = "Elementos contenidos en la página actual")
     private final List<T> content;
+
+    @Schema(description = "Número de página actual (basado en 0)", example = "0")
     private final int page;
+
+    @Schema(description = "Cantidad máxima de elementos por página", example = "10")
     private final int size;
+
+    @Schema(description = "Cantidad total de registros disponibles", example = "25")
     private final long totalElements;
+
+    @Schema(description = "Cantidad total de páginas disponibles", example = "3")
     private final int totalPages;
+
+    @Schema(description = "Indica si esta es la primera página", example = "true")
     private final boolean first;
+
+    @Schema(description = "Indica si esta es la última página", example = "false")
     private final boolean last;
 
     public PageResponse(
