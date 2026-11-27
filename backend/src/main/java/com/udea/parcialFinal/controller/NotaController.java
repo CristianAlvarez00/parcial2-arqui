@@ -70,6 +70,33 @@ public class NotaController {
         );
     }
 
+    @GetMapping("/{materiaCodigo}")
+    @Operation(
+            summary = "Consultar la nota de un estudiante en una materia",
+            description = "Retorna la calificación del estudiante en la materia indicada, con sus enlaces HATEOAS."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Nota encontrada"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Formato de cédula inválido",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Estudiante no encontrado o sin nota en la materia",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))
+            )
+    })
+    public EntityModel<NotaResponse> consultarPorMateria(
+            @Parameter(description = "Número de cédula del estudiante (solo dígitos)", example = "1001234567")
+            @PathVariable("cedula") String cedula,
+            @Parameter(description = "Código de la materia", example = "ARQ01")
+            @PathVariable("materiaCodigo") String materiaCodigo
+    ) {
+        return EnlacesHateoas.nota(notas.consultarPorMateria(cedula, materiaCodigo));
+    }
+
     @PostMapping
     @Operation(
             summary = "Registrar nota a un estudiante",
@@ -82,7 +109,7 @@ public class NotaController {
                     description = "Nota registrada exitosamente",
                     headers = @Header(
                             name = "Location",
-                            description = "URI de consulta de notas del estudiante",
+                            description = "URI de la nota registrada",
                             schema = @Schema(type = "string")
                     )
             ),

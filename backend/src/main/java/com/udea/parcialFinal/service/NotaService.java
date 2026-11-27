@@ -56,6 +56,16 @@ public class NotaService {
         return PageResponse.de(new PageImpl<>(resultado.notas(), pagina, resultado.total()));
     }
 
+    @Transactional(readOnly = true)
+    public NotaResponse consultarPorMateria(String cedula, String materiaCodigo) {
+        Estudiante estudiante = estudiantes.buscarPorCedula(cedula);
+        String codigo = Validacion.texto(materiaCodigo, "materiaCodigo", 20);
+        Matricula matricula = matriculas.findByEstudiante_IdAndMateria_Codigo(estudiante.getId(), codigo)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "El estudiante no tiene nota registrada en esta materia."));
+        return representarNota(matricula, estudiante.getCedula());
+    }
+
     private ConsultaNotasCache.Pagina consultarEnBaseDeDatos(String cedula, Pageable pagina) {
         Estudiante estudiante = estudiantes.buscarPorCedula(cedula);
         Page<NotaResponse> notas = matriculas.findByEstudiante_IdOrderByIdAsc(estudiante.getId(), pagina)

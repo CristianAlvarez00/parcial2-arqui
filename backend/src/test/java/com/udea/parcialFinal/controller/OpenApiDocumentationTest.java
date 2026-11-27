@@ -65,6 +65,8 @@ class OpenApiDocumentationTest {
                         .value("Listar notas de un estudiante"))
                 .andExpect(jsonPath("$.paths['/api/v1/estudiantes/{cedula}/notas'].post.summary")
                         .value("Registrar nota a un estudiante"))
+                .andExpect(jsonPath("$.paths['/api/v1/estudiantes/{cedula}/notas/{materiaCodigo}'].get.summary")
+                        .value("Consultar la nota de un estudiante en una materia"))
                 .andExpect(jsonPath("$.paths['/api/v1/materias'].get.summary").value("Listar materias paginadas"))
                 .andExpect(jsonPath("$.paths['/api/v1/materias/{codigo}'].get.summary")
                         .value("Consultar materia por código"));
